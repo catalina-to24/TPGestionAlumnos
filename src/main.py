@@ -1,8 +1,15 @@
+#para la ruta csv
+from pathlib import Path 
 import tkinter as tk
-from manejo_estudiantes import cargar_alumnos, guardar_alumnos, agregar_alumno, mostrar_alumnos
-from interfaz import crear_interfaz
+from manejo_estudiantes import cargar_alumnos, guardar_alumnos, agregar_alumno
+from interfaz import crear_interfaz, mostrar_callback
 
-filename = "C:\\Users\\Administrator\\OneDrive\\Desktop\\UADE\1° año\1°Cuatri\\Intro_algoritmia\\TP\\TPGestionAlumnos\\data\\alumnos.csv"
+# Obtener la ruta absoluta del directorio actual (donde está main.py)
+base_dir = Path(__file__).resolve().parent
+
+# Construir la ruta relativa al archivo CSV
+filename = base_dir / "../data/alumnos.csv"
+
 students = cargar_alumnos(filename)
 
 def guardar_callback():
@@ -10,5 +17,5 @@ def guardar_callback():
 
 root = tk.Tk()
 root.title("Sistema de Gestión de Alumnos")
-crear_interfaz(root, students, agregar_alumno, mostrar_alumnos, guardar_callback)
+crear_interfaz(root, students, agregar_alumno, mostrar_callback, guardar_callback)
 root.mainloop()

@@ -58,5 +58,18 @@ def crear_interfaz(root, students, agregar_callback, mostrar_callback, guardar_c
     tree.heading("NotaFinal", text="Nota Final")
     tree.pack()
 
+    # Botón para mostrar alumnos
     tk.Button(root, text="Mostrar Alumnos", command=lambda: mostrar_callback(tree, students)).pack(pady=10)
+
+    # Botón para guardar y salir
     tk.Button(root, text="Guardar y Salir", command=lambda: [guardar_callback(), root.destroy()]).pack(pady=10)
+
+def mostrar_callback(tree, students):
+    
+    # Limpiar el Treeview antes de agregar nuevos datos
+    for item in tree.get_children():
+        tree.delete(item)
+    
+    # Agregar los datos de los alumnos al Treeview
+    for student in students:
+        tree.insert("", "end", values=(student[0], student[1], student[2], student[3], student[4], student[5]))
