@@ -24,6 +24,7 @@ def agregar_alumno(students, nombre, materia, nota1, nota2, nota3):
         raise ValueError("Las notas deben estar entre 0 y 10.")
     nota_final = (nota1 + nota2 + nota3) / 3
     students.append([nombre, materia, nota1, nota2, nota3, nota_final])
+    
 
 def mostrar_alumnos(students):
     for student in students:
