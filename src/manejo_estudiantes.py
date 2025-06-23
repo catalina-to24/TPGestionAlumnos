@@ -1,58 +1,83 @@
-import csv  # Biblioteca para manejar archivos CSV
-from pathlib import Path  # Biblioteca para manejar rutas de archivos de forma flexible
+import csv  # Para leer y escribir archivos CSV
 
-# Función para cargar los datos de los alumnos desde un archivo CSV
+# Cargar alumnos desde un archivo CSV
 def cargar_alumnos(filename):
-    """
-    Lee los datos de un archivo CSV y los carga en una lista.
-    Cada fila del archivo representa un alumno con sus datos.
-    """
-    students = []  # Lista para almacenar los datos de los alumnos
+    alumnos = []
     try:
-        with open(filename, 'r') as file:  # Abrir el archivo en modo lectura
-            reader = csv.reader(file)  # Crear un lector CSV
-            next(reader)  # Saltar la cabecera del archivo
-            for row in reader:
-                row[2:6] = list(map(float, row[2:6]))  # Convertir las notas (columnas 2 a 5) a tipo float
-                students.append(row)  # Agregar la fila procesada a la lista de alumnos
+        with open(filename, 'r') as archivo:
+            lector = csv.reader(archivo)
+            next(lector)  # Salta la primera línea (los títulos)
+            for fila in lector:
+                # Convierte las notas a números decimales
+                fila[2] = float(fila[2])
+                fila[3] = float(fila[3])
+                fila[4] = float(fila[4])
+                fila[5] = float(fila[5])
+                alumnos.append(fila)
     except FileNotFoundError:
-        # Lanzar un error si el archivo no existe
-        raise FileNotFoundError(f"El archivo {filename} no existe. Verifica la ruta.")
-    return students  # Devolver la lista de alumnos
+        print(f"No se encontró el archivo {filename}")
+    return alumnos
 
-# Función para guardar los datos de los alumnos en un archivo CSV
-def guardar_alumnos(filename, students):
-    """
-    Escribe los datos de los alumnos en un archivo CSV.
-    Sobrescribe el archivo si ya existe.
-    """
-    with open(filename, 'w', newline='') as file:  # Abrir el archivo en modo escritura
-        writer = csv.writer(file)  # Crear un escritor CSV
-        # Escribir la cabecera del archivo
-        writer.writerow(["Nombre", "Materia", "Nota1", "Nota2", "Nota3", "NotaFinal"])
-        # Escribir los datos de los alumnos
-        writer.writerows(students)
+# Guardar alumnos en un archivo CSV
+def guardar_alumnos(filename, alumnos):
+    with open(filename, 'w', newline='') as archivo:
+        escritor = csv.writer(archivo)
+        escritor.writerow(["Nombre", "Materia", "Nota1", "Nota2", "Nota3", "NotaFinal"])
+        escritor.writerows(alumnos)
 
-# Función para agregar un nuevo alumno a la lista
-def agregar_alumno(students, nombre, materia, nota1, nota2, nota3):
-    """
-    Agrega un nuevo alumno a la lista de estudiantes.
-    Calcula la nota final como el promedio de las tres notas.
-    """
-    # Validar que las notas estén en el rango de 0 a 10
+# Agregar un alumno a la lista
+def agregar_alumno(alumnos, nombre, materia, nota1, nota2, nota3):
+    # Verifica que las notas estén entre 0 y 10
     if not (0 <= nota1 <= 10 and 0 <= nota2 <= 10 and 0 <= nota3 <= 10):
         raise ValueError("Las notas deben estar entre 0 y 10.")
-    # Calcular la nota final como el promedio de las tres notas
     nota_final = (nota1 + nota2 + nota3) / 3
-    # Agregar el nuevo alumno a la lista
-    students.append([nombre, materia, nota1, nota2, nota3, nota_final])
+    alumnos.append([nombre, materia, nota1, nota2, nota3, nota_final])
 
-# Función para mostrar los datos de los alumnos en la consola
-def mostrar_alumnos(students):
-    """
-    Imprime los datos de los alumnos en la consola.
-    Incluye el nombre, materia, notas y promedio final.
-    """
-    for student in students:
-        # Formatear e imprimir los datos de cada alumno
-        print(f"{student[0]} - {student[1]} - Notas: {student[2]}, {student[3]}, {student[4]} - Promedio: {student[5]:.2f}")
+
+# Listado completo de alumnos con sus notas y promedio
+def informe_listado_completo(alumnos):
+    return [
+        f"{a[0]} | {a[1]} | Notas: {a[2]}, {a[3]}, {a[4]} | Promedio: {a[5]:.2f}"
+        for a in alumnos
+    ]
+
+# Promedio general por materia
+def informe_promedio_por_materia(alumnos):
+    materias = {}
+    for a in alumnos:
+        materia = a[1]
+        if materia not in materias:
+            materias[materia] = []
+        materias[materia].append(a[5])
+    return {m: sum(notas)/len(notas) for m, notas in materias.items()}
+
+# Alumnos con nota final mayor a un valor dado
+def informe_mayor_a(alumnos, valor):
+    return [a for a in alumnos if a[5] > valor]
+
+# Alumnos con al menos una nota menor a 4
+def informe_nota_menor_a_4(alumnos):
+    return [a for a in alumnos if a[2] < 4 or a[3] < 4 or a[4] < 4]
+
+# Cantidad de aprobados y desaprobados por materia (aprobado: promedio >= 6)
+def informe_aprobados_desaprobados(alumnos):
+    materias = {}
+    for a in alumnos:
+        materia = a[1]
+        if materia not in materias:
+            materias[materia] = {"aprobados": 0, "desaprobados": 0}
+        if a[5] >= 6:
+            materias[materia]["aprobados"] += 1
+        else:
+            materias[materia]["desaprobados"] += 1
+    return materias
+
+# ORDENAMIENTOS
+
+# Ordenar por nombre de alumno (A-Z)
+def ordenar_por_nombre(alumnos):
+    alumnos.sort(key=lambda a: a[0])
+
+# Ordenar por nota final (de mayor a menor)
+def ordenar_por_nota_final(alumnos):
+    alumnos.sort(key=lambda a: a[5], reverse=True)
